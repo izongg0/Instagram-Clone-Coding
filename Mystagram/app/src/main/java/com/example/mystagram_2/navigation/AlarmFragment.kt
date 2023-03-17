@@ -53,8 +53,10 @@ class AlarmFragment : Fragment() {
         }
 
         inner class CustomViewHolder(view : View) : RecyclerView.ViewHolder(view)
+
         init {
             val uid = FirebaseAuth.getInstance().currentUser?.uid
+            // 현재 로그인한 계정을 타겟으로 한 모든 알림들을 가져옴
             FirebaseFirestore.getInstance().collection("alarms").whereEqualTo("destinationUid",uid).addSnapshotListener { querySnapshot, error ->
                 alarmDTOList.clear()
                 if(querySnapshot == null) return@addSnapshotListener
@@ -85,15 +87,15 @@ class AlarmFragment : Fragment() {
 
             when(alarmDTOList[position].kind){
 
-                0 ->{
+                0 ->{ // 좋아요 알림
                     val str0 = alarmDTOList[position].userId + getString(R.string.alarm_favorite)
                     profiletxt.text = str0
                 }
-                1 ->{
+                1 ->{ // 댓글 알림
                     val str0 = alarmDTOList[position].userId + " " + getString(R.string.alarm_comment) + " of "+ alarmDTOList[position].message
                     profiletxt.text = str0
                 }
-                2 ->{
+                2 ->{ // 팔로우 알림
                     val str0 = alarmDTOList[position].userId +" " + getString(R.string.alarm_follow)
                     profiletxt.text = str0
                 }

@@ -22,7 +22,7 @@ import java.util.*
 class AddPhotoActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0
     var storage : FirebaseStorage? = null
-    var photoUri : Uri? = null
+    var photoUri : Uri? = null //  사진uri를 저장하기 위한 변수
     var auth : FirebaseAuth? = null
     var firestore : FirebaseFirestore? = null
 
@@ -39,6 +39,7 @@ class AddPhotoActivity : AppCompatActivity() {
         //앨범열기
         var photoPickerIntent = Intent(Intent.ACTION_PICK)
         photoPickerIntent.type = "image/*"
+        // 바텀 네비게이션에서 addImage버튼 클릭하면 사진을 고르는 화면이 나온다.
         startActivityForResult(photoPickerIntent,PICK_IMAGE_FROM_ALBUM)
 
         //업로드이벤트
@@ -51,8 +52,10 @@ class AddPhotoActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == PICK_IMAGE_FROM_ALBUM){
             if(resultCode == Activity.RESULT_OK){
-                // 사진을 선택했을 때 이미지 경로가 여기로 옴
+                // 사진을 선택했을때, 선택한 사진의 uri가 변수에 들어감.
                 photoUri = data?.data
+
+                // 선택한 사진이 사진올리는 페이지에 미리보기로 나옴.
                 findViewById<ImageView>(R.id.addphoto_img).setImageURI(photoUri)
 
             }else{
@@ -64,22 +67,34 @@ class AddPhotoActivity : AppCompatActivity() {
     fun contentUpload(){
 
         var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        // 사진 파일 이름이 중복되지 않도록 업로드하는 시간으로 지정.
         var imageFileName = "IMAGE_" + timestamp + "_.png"
 
+        // storage에서 images폴더 내부에 imageFilename의 파일이름으로 저장되도록 하는 변수
         var storageRef = storage?.reference?.child("images")?.child(imageFileName)
 
+
+        // 함수가 실행되는 순서를 참조하면 이 함수가 실행 될때는
+        // 전역으로 선언한 photoUri변수 안에 선택한 이미지 주소가 들어있음.
         storageRef?.putFile(photoUri!!)?.continueWithTask{task : Task<UploadTask.TaskSnapshot>->
             return@continueWithTask storageRef.downloadUrl
         }?.addOnSuccessListener { uri ->
             var contentDTO = ContentDTO()
 
+            // 사진을 올리는 계정 정보, 사진설명, 사진 주소, 현재 시간 등을 contentDTO변수에 담음.
             contentDTO.imageUrl = uri.toString()
             contentDTO.uid = auth?.currentUser?.uid
             contentDTO.userId = auth?.currentUser?.email
             contentDTO.explain = findViewById<EditText>(R.id.addphoto_edit_explain).text.toString()
             contentDTO.timestamp = System.currentTimeMillis()
+
+
+            // 업로드한 이미지와 계정에 대한 정보를 디비에 저장함.
             firestore?.collection("images")?.document()?.set(contentDTO)
+
             setResult(Activity.RESULT_OK)
+
+            // 업로드가 완료되면 창을 닫음.
             finish()
 
         }

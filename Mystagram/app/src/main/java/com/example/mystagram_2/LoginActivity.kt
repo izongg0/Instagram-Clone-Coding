@@ -56,25 +56,12 @@ class LoginActivity : AppCompatActivity() {
             }
 
 
-//        auth?.createUserWithEmailAndPassword(input_email.text.toString(),input_pwd.text.toString())?.addOnCompleteListener{
-//
-//            task ->
-//            if(task.isSuccessful){
-//                //회원가입 성공
-//                moveMainPage(task.result.user)
-//
-//            }else if(task.exception?.message.isNullOrEmpty()){
-//                //회원가입 실패
-//                Toast.makeText(this,task.exception?.message,Toast.LENGTH_LONG)
-//
-//            }else{
-//                //아무것도 아닐때
-//            }
-//        }
+
 
     }
 
     fun signinEmail(){
+        // 로그인
         var input_email = findViewById<EditText>(R.id.input_email)
         var input_pwd = findViewById<EditText>(R.id.input_pwd)
         auth?.signInWithEmailAndPassword(input_email.text.toString(),input_pwd.text.toString())

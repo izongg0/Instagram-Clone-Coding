@@ -29,6 +29,8 @@ class CommentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comment)
 
+
+
         contentUid = intent.getStringExtra("contentUid")
         destinationUid = intent.getStringExtra("destinationUid")
 
@@ -38,11 +40,13 @@ class CommentActivity : AppCompatActivity() {
         findViewById<Button>(R.id.comment_btn_send)?.setOnClickListener {
 
             var comment = ContentDTO.Comment()
+            // 현재 로그인한 계정에 대한 정보와 댓글 내용, 현재 시간을 변수에 넣음
             comment.userId = FirebaseAuth.getInstance().currentUser?.email
             comment.uid = FirebaseAuth.getInstance().currentUser?.uid
             comment.comment  = findViewById<EditText>(R.id.comment_edit_message).text.toString()
             comment.timestamp = System.currentTimeMillis()
 
+            // 이미지 디비의 해당 사진의 폴더안에 그 사진에 해당하는 댓글 디비에 넣음.
             FirebaseFirestore.getInstance().collection("images").document(contentUid!!).collection("comments").document().set(comment)
             commentAlarm(destinationUid!!,findViewById<EditText>(R.id.comment_edit_message).text.toString())
             findViewById<EditText>(R.id.comment_edit_message).setText("")
@@ -52,6 +56,7 @@ class CommentActivity : AppCompatActivity() {
 
     }
 
+    // 누가 누구에게 어떤 댓글을 남겼는지 알려주는 이벤트
     fun commentAlarm(destinationUid : String,message : String){
 
         var alarmDTO = AlarmDTO()
@@ -66,10 +71,12 @@ class CommentActivity : AppCompatActivity() {
 
     }
 
+    // 댓글 리스트를 보여주는 리스트어댑터
     inner class CommentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
         var comments : ArrayList<ContentDTO.Comment> = arrayListOf()
         init{
+            // 이미지 디비의 해당 사진의 디비안에 들어있는 댓글들에 대한 데이터를 스냅샷을 이용해 시간 순으로 모두 가져옴.
             FirebaseFirestore.getInstance().collection("images").document(contentUid!!).collection("comments")
                 .orderBy("timestamp").addSnapshotListener { querySnapshot, error ->
                     comments.clear()
@@ -102,6 +109,7 @@ class CommentActivity : AppCompatActivity() {
             view.findViewById<TextView>(R.id.commentviewitem_textview_comment).text = comments[position].comment
             view.findViewById<TextView>(R.id.commentviewitem_textview_profile).text = comments[position].userId
 
+            // 댓글을 남긴 사람의 프로필 이미지를 댓글 옆에 프로필 사진에 출력
             FirebaseFirestore.getInstance()
                 .collection("profileImages")
                 .document(comments[position].uid!!).get()
