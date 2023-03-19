@@ -24,6 +24,7 @@
                 android:layout_height="wrap_content"
                 android:hint="email"
                 />
+
             <EditText
                 android:id="@+id/input_pwd"
                 android:layout_width="match_parent"

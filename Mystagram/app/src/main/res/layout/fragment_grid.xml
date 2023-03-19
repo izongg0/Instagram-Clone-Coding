@@ -3,9 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".navigation.GridFragment">
+    tools:context=".navigation.GridFragment"
+    android:orientation="vertical">
 
     <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+    android:layout_marginTop="10dp"
+    android:layout_width="300dp"
+    android:layout_height="50dp"
+    android:text="TEST"
+    android:id="@+id/testtx" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/textimg" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

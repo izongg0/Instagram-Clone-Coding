@@ -1,6 +1,7 @@
 package com.example.mystagram_2.navigation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,16 +14,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.mystagram_2.R
+import com.example.mystagram_2.databinding.ActivityMainBinding
+import com.example.mystagram_2.databinding.FragmentGridBinding
 import com.example.mystagram_2.navigation.model.ContentDTO
+import com.example.mystagram_2.navigation.model.FollowDTO
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
 
 class GridFragment : Fragment() {
+    val binding by lazy { FragmentGridBinding.inflate(layoutInflater) }
+
     var registration: ListenerRegistration? = null
 
+    var testarray : Array<String>? = arrayOf()
     var fragmentView: View? = null
+
     var firestore : FirebaseFirestore? = null
+
+    var auth : FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +46,46 @@ class GridFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        fragmentView= LayoutInflater.from(activity).inflate(R.layout.fragment_grid, container, false)
+        auth = FirebaseAuth.getInstance()
 
-        var gridrv = fragmentView?.findViewById<RecyclerView>(R.id.gridrv)
+        var gridrv = binding.gridrv
         gridrv?.adapter = UserFragmentRecyclerViewAdapter()
         gridrv?.layoutManager = GridLayoutManager(activity,3)
 
-        return fragmentView
+
+        firestore = FirebaseFirestore.getInstance()
+
+        var tsDocFollower = firestore?.collection("users")?.document(auth?.currentUser!!.uid)
+
+//        tsDocFollower?.get()?.addOnSuccessListener { documentSnapshot ->
+//            if (documentSnapshot.exists()) {
+//                val name = documentSnapshot.get("followings")
+//                                Log.d("eeeeee",name!!.javaClass.name)
+//
+//            } else
+//            {
+//            }
+//        }?.addOnFailureListener { e ->
+//            }
+
+
+
+//
+//        firestore?.runTransaction{ transaction ->
+//
+//            var test = transaction.get(tsDocFollower!!).toObject(FollowDTO::class.java)
+//            binding.testtx.text = test!!.followings.toString()
+//            Log.d("dddddd",test!!.followings.javaClass.name)
+//
+//            if( test.followings.containsKey("w3iGGIKVsxPkTVSjQiS2XlrAh9l1")){
+//                Log.d("eeeeee","있다 !")
+//
+//            }
+//        }
+
+
+
+        return binding.root
     }
     inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 

@@ -10,6 +10,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.mystagram_2.R
+import com.example.mystagram_2.databinding.ActivityAddPhotoBinding
+import com.example.mystagram_2.databinding.ActivityMainBinding
 import com.example.mystagram_2.navigation.model.ContentDTO
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class AddPhotoActivity : AppCompatActivity() {
+    val binding by lazy { ActivityAddPhotoBinding.inflate(layoutInflater) }
+
     var PICK_IMAGE_FROM_ALBUM = 0
     var storage : FirebaseStorage? = null
     var photoUri : Uri? = null //  사진uri를 저장하기 위한 변수
@@ -29,7 +33,7 @@ class AddPhotoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_photo)
+        setContentView(binding.root)
 
         //스토리지 초기화
         storage = FirebaseStorage.getInstance()
@@ -43,7 +47,7 @@ class AddPhotoActivity : AppCompatActivity() {
         startActivityForResult(photoPickerIntent,PICK_IMAGE_FROM_ALBUM)
 
         //업로드이벤트
-        findViewById<Button>(R.id.addphoto_btn).setOnClickListener {
+        binding.addphotoBtn.setOnClickListener {
             contentUpload()
         }
     }
@@ -56,7 +60,7 @@ class AddPhotoActivity : AppCompatActivity() {
                 photoUri = data?.data
 
                 // 선택한 사진이 사진올리는 페이지에 미리보기로 나옴.
-                findViewById<ImageView>(R.id.addphoto_img).setImageURI(photoUri)
+                binding.addphotoImg.setImageURI(photoUri)
 
             }else{
                 //취소버튼 눌렀을 때
@@ -85,7 +89,7 @@ class AddPhotoActivity : AppCompatActivity() {
             contentDTO.imageUrl = uri.toString()
             contentDTO.uid = auth?.currentUser?.uid
             contentDTO.userId = auth?.currentUser?.email
-            contentDTO.explain = findViewById<EditText>(R.id.addphoto_edit_explain).text.toString()
+            contentDTO.explain = binding.addphotoEditExplain.text.toString()
             contentDTO.timestamp = System.currentTimeMillis()
 
 

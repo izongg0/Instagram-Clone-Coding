@@ -63,6 +63,7 @@ class UserFragment : Fragment() {
         uid = arguments?.getString("destinationUid")
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        var mainactivity = ( activity as MainActivity)
 
         // 여기엔 현재 로그인한 계정의 주인에 대한 정보가 담겨있음.
         currentUserUid = auth?.currentUser?.uid
@@ -72,6 +73,16 @@ class UserFragment : Fragment() {
             //mypage
             var sighoutbtn = fragmentView?.findViewById<Button>(R.id.account_btn_follow_signout)
             // 팔로우 하기 버튼이 아니라 로그아웃을 하는 버튼이 있음
+            mainactivity?.findViewById<TextView>(R.id.toolbar_username)?.text = auth?.currentUser?.email
+
+            mainactivity.findViewById<ImageView>(R.id.toolbar_title_image)?.visibility = View.GONE
+            mainactivity.findViewById<TextView>(R.id.toolbar_username)?.visibility = View.VISIBLE
+            mainactivity.findViewById<ImageView>(R.id.toolbar_btn_back)?.visibility = View.VISIBLE
+
+            mainactivity?.findViewById<ImageView>(R.id.toolbar_btn_back)?.setOnClickListener {
+                mainactivity.findViewById<BottomNavigationView>(R.id.bottom_nav).selectedItemId = R.id.action_home
+            }
+
             sighoutbtn?.text = getString(R.string.signout)
             sighoutbtn?.setOnClickListener {
                 activity?.finish()
@@ -83,7 +94,6 @@ class UserFragment : Fragment() {
 
             var sighoutbtn = fragmentView?.findViewById<Button>(R.id.account_btn_follow_signout)
             sighoutbtn?.text = getString(R.string.follow)
-            var mainactivity = ( activity as MainActivity)
             // 툴바에 해당 사진의 주인의 아이디가 상단에 출력됨.
             mainactivity?.findViewById<TextView>(R.id.toolbar_username)?.text = arguments?.getString("userid")
 
@@ -189,7 +199,7 @@ class UserFragment : Fragment() {
                 followDTO?.followings?.remove(uid)
 
             } else {
-            // 팔로우를 하기위해 누른경우
+                // 팔로우를 하기위해 누른경우
                 followDTO?.followingCount = followDTO.followingCount + 1
                 followDTO.followings[uid!!] = true
             }

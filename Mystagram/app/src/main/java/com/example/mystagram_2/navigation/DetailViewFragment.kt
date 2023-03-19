@@ -2,6 +2,7 @@ package com.example.mystagram_2.navigation
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,18 +12,25 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.example.mystagram_2.R
+import com.example.mystagram_2.databinding.ActivityMainBinding
+import com.example.mystagram_2.databinding.FragmentDetailViewBinding
 import com.example.mystagram_2.navigation.model.AlarmDTO
 import com.example.mystagram_2.navigation.model.ContentDTO
+import com.example.mystagram_2.navigation.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 
 
 class DetailViewFragment : Fragment() {
+    var auth : FirebaseAuth? = null
 
-var firestore : FirebaseFirestore? = null
-var uid :  String? = null
+    var firestore : FirebaseFirestore? = null
+    var uid :  String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,6 +42,7 @@ var uid :  String? = null
     ): View? {
         // Inflate the layout for this fragment
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail_view, container, false)
+        auth = FirebaseAuth.getInstance()
 
 
         firestore = FirebaseFirestore.getInstance()
@@ -55,21 +64,36 @@ var uid :  String? = null
 
         init{
 
-            // 스토어 안에 있는 모든 이미지들을 시간 순으로 정렬하여 싹 다 가져옴.
-            firestore?.collection("images")?.orderBy("timestamp")?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                contentDTOs.clear()
-                contentUidList.clear()
+            var tsDocFollower = firestore?.collection("users")?.document(auth?.currentUser!!.uid)
 
-                if(querySnapshot == null) return@addSnapshotListener
-                for(snapshot in querySnapshot!!.documents){
-                    var item = snapshot.toObject(ContentDTO::class.java)
-                    // 사진에 대한 계정 정보와 사진 정보를 변수에 담음
-                    contentDTOs.add(item!!)
-                    // 사진마다 각자 자동으로 생성된 아이디를 uid 리스트 변수에 추가
-                    contentUidList.add(snapshot.id)
-                }
-                notifyDataSetChanged()
-            }
+            var test : MutableMap<String,Boolean>?
+            tsDocFollower?.get()?.addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    test = documentSnapshot.toObject<FollowDTO>()?.followings
+                    firestore?.collection("images")?.orderBy("timestamp")?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                        contentDTOs.clear()
+                        contentUidList.clear()
+
+                        if(querySnapshot == null) return@addSnapshotListener
+                        for(snapshot in querySnapshot!!.documents){
+                            var item = snapshot.toObject(ContentDTO::class.java)
+
+                            if (test!!.containsKey(item?.uid)){
+                                // 사진에 대한 계정 정보와 사진 정보를 변수에 담음
+                                contentDTOs.add(item!!)
+                                // 사진마다 각자 자동으로 생성된 아이디를 uid 리스트 변수에 추가
+                                contentUidList.add(snapshot.id)
+
+                            }
+
+
+                        }
+                        notifyDataSetChanged()
+                    }
+                } }
+
+            // 스토어 안에 있는 모든 이미지들을 시간 순으로 정렬하여 싹 다 가져옴.
+
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

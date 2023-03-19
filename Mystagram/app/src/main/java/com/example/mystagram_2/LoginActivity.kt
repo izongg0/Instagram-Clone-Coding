@@ -8,23 +8,26 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.example.mystagram_2.databinding.ActivityLoginBinding
+import com.example.mystagram_2.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class LoginActivity : AppCompatActivity() {
+    val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
 
     var auth : FirebaseAuth? = null
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
 
-        findViewById<Button>(R.id.signup_btn).setOnClickListener {
+        binding.signupBtn.setOnClickListener {
 
             signinAndSignup()
         }
-        findViewById<Button>(R.id.login_btn).setOnClickListener {
+        binding.loginBtn.setOnClickListener {
 
             signinEmail()
         }
@@ -38,8 +41,8 @@ class LoginActivity : AppCompatActivity() {
 //    }
     fun signinAndSignup(){
 
-        var input_email = findViewById<EditText>(R.id.input_email)
-        var input_pwd = findViewById<EditText>(R.id.input_pwd)
+        var input_email = binding.inputEmail
+        var input_pwd = binding.inputPwd
 
     // 파이어베이스 회원가입
         auth?.createUserWithEmailAndPassword(input_email.text.toString(),input_pwd.text.toString())
@@ -62,8 +65,8 @@ class LoginActivity : AppCompatActivity() {
 
     fun signinEmail(){
         // 로그인
-        var input_email = findViewById<EditText>(R.id.input_email)
-        var input_pwd = findViewById<EditText>(R.id.input_pwd)
+        var input_email = binding.inputEmail
+        var input_pwd = binding.inputPwd
         auth?.signInWithEmailAndPassword(input_email.text.toString(),input_pwd.text.toString())
             ?.addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {

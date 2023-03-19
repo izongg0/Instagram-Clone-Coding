@@ -12,12 +12,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Glide.init
 import com.bumptech.glide.request.RequestOptions
 import com.example.mystagram_2.R
+import com.example.mystagram_2.databinding.ActivityMainBinding
+import com.example.mystagram_2.databinding.FragmentAlarmBinding
 import com.example.mystagram_2.navigation.model.AlarmDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class AlarmFragment : Fragment() {
+    val binding by lazy { FragmentAlarmBinding.inflate(layoutInflater) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,14 +33,14 @@ class AlarmFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var view = LayoutInflater.from(activity).inflate(R.layout.fragment_alarm, container, false)
+//        var view = LayoutInflater.from(activity).inflate(R.layout.fragment_alarm, container, false)
 
-        var alarmrv = view.findViewById<RecyclerView>(R.id.alarmrv)
+        var alarmrv = binding.alarmrv
         alarmrv.adapter = AlarmRecyclerAdapter()
         alarmrv.layoutManager = LinearLayoutManager(activity)
 
 
-        return view
+        return binding.root
     }
 
 

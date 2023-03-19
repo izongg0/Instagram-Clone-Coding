@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.mystagram_2.R
+import com.example.mystagram_2.databinding.ActivityCommentBinding
+import com.example.mystagram_2.databinding.ActivityMainBinding
 import com.example.mystagram_2.navigation.model.AlarmDTO
 import com.example.mystagram_2.navigation.model.ContentDTO
 import com.google.firebase.auth.FirebaseAuth
@@ -23,11 +25,12 @@ import com.google.firebase.ktx.Firebase
 class CommentActivity : AppCompatActivity() {
     var contentUid : String? = null
     var destinationUid : String? = null
+    val binding by lazy { ActivityCommentBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_comment)
+        setContentView(binding.root)
 
 
 
@@ -43,13 +46,13 @@ class CommentActivity : AppCompatActivity() {
             // 현재 로그인한 계정에 대한 정보와 댓글 내용, 현재 시간을 변수에 넣음
             comment.userId = FirebaseAuth.getInstance().currentUser?.email
             comment.uid = FirebaseAuth.getInstance().currentUser?.uid
-            comment.comment  = findViewById<EditText>(R.id.comment_edit_message).text.toString()
+            comment.comment  = binding.commentEditMessage.text.toString()
             comment.timestamp = System.currentTimeMillis()
 
             // 이미지 디비의 해당 사진의 폴더안에 그 사진에 해당하는 댓글 디비에 넣음.
             FirebaseFirestore.getInstance().collection("images").document(contentUid!!).collection("comments").document().set(comment)
-            commentAlarm(destinationUid!!,findViewById<EditText>(R.id.comment_edit_message).text.toString())
-            findViewById<EditText>(R.id.comment_edit_message).setText("")
+            commentAlarm(destinationUid!!,binding.commentEditMessage.text.toString())
+            binding.commentEditMessage.setText("")
         }
 
 
@@ -115,7 +118,7 @@ class CommentActivity : AppCompatActivity() {
                 .document(comments[position].uid!!).get()
                 .addOnCompleteListener { task ->
                     if(task.isSuccessful){
-                        var url = task.result!!["images"]
+                        var url = task.result!!["imagesUri"]
                         Glide.with(holder.itemView.context).load(url).apply(RequestOptions().circleCrop()).into(view.findViewById<ImageView>(R.id.commentviewitem_imageview_profile))
                     }
                 }
